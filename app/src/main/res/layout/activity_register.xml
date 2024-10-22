@@ -28,6 +28,24 @@
         android:hint="Email" />
 
     <EditText
+        android:id="@+id/registerNama"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20sp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+        android:hint="Nama" />
+
+    <EditText
+        android:id="@+id/registerNim"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20sp"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
+        android:hint="NIM" />
+
+    <EditText
         android:id="@+id/registerPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

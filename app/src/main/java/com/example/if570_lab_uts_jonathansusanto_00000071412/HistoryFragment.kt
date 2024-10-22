@@ -1,10 +1,15 @@
 package com.example.if570_lab_uts_jonathansusanto_00000071412
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -20,6 +25,11 @@ class HistoryFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var attendanceAdapter: AttendanceAdapter
+    private lateinit var attendanceList: MutableList<AttendanceRecord>
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var mAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +44,45 @@ class HistoryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_history, container, false)
+        val view = inflater.inflate(R.layout.fragment_history, container, false)
+        recyclerView = view.findViewById(R.id.recyclerViewHistory)
+
+        // Initialize Firebase Auth and Firestore
+        mAuth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
+
+        // Initialize the list and adapter
+        attendanceList = mutableListOf()
+        attendanceAdapter = AttendanceAdapter(attendanceList)
+
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = attendanceAdapter
+
+        fetchAttendanceHistory()
+
+        return view
+    }
+
+    private fun fetchAttendanceHistory() {
+        val currentUser = mAuth.currentUser
+        currentUser?.let {
+            val email = it.email
+            firestore.collection("attendance")
+                .whereEqualTo("email", email)
+//                .orderBy("dateTime", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener { documents ->
+                    attendanceList.clear()
+                    for (document in documents) {
+                        val attendanceRecord = document.toObject(AttendanceRecord::class.java)
+                        attendanceList.add(attendanceRecord)
+                    }
+                    attendanceAdapter.notifyDataSetChanged()
+                }
+                .addOnFailureListener { exception ->
+                    Log.w("Firestore", "Error getting documents: ", exception)
+                }
+        }
     }
 
     companion object {

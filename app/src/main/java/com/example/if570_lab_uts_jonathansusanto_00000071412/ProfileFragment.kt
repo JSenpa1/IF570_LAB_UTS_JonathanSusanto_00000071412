@@ -1,10 +1,16 @@
 package com.example.if570_lab_uts_jonathansusanto_00000071412
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,6 +27,16 @@ class ProfileFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    // Firebase instances
+    private lateinit var firestore: FirebaseFirestore
+    private lateinit var auth: FirebaseAuth
+
+    // UI elements
+    private lateinit var textEmail: TextView
+    private lateinit var textNama: TextView
+    private lateinit var textNim: TextView
+    private lateinit var buttonEditProfile: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -34,8 +50,65 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+        val view = inflater.inflate(R.layout.fragment_profile, container, false)
+
+        // Initialize Firebase instances
+        firestore = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
+
+        // Find the views in the layout
+        textEmail = view.findViewById(R.id.textEmail)
+        textNama = view.findViewById(R.id.textNama)
+        textNim = view.findViewById(R.id.textNim)
+        buttonEditProfile = view.findViewById(R.id.buttonEditProfile)
+
+        loadUserProfile()
+
+        buttonEditProfile.setOnClickListener {
+            // Navigate to the fragment where the user can edit their profile (you need to implement this)
+            // For example, use Navigation component to go to the EditProfileFragment
+            Intent(activity, EditProfile::class.java).also {
+                startActivity(it)
+            }
+        }
+
+        return view
     }
+
+    // Fetch the user data from Firestore
+    private fun loadUserProfile() {
+        val currentUser = auth.currentUser
+        currentUser?.let {
+            val userEmail = currentUser.email?.trim() ?: ""
+
+            // Query Firestore to get the user document based on their email
+            firestore.collection("users")
+                .whereEqualTo("email", userEmail)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if (!documents.isEmpty) {
+                        val userDocument = documents.documents[0]
+
+                        // Extract the user's data from the document
+                        val email = userDocument.getString("email") ?: ""
+                        val nama = userDocument.getString("nama") ?: ""
+                        val nim = userDocument.getString("nim") ?: ""
+
+                        // Update the UI with the user's data
+                        textEmail.text = email
+                        textNama.text = nama
+                        textNim.text = nim
+                    } else {
+                        Toast.makeText(requireContext(), "No user data found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Toast.makeText(requireContext(), "Error fetching data: ${exception.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+
 
     companion object {
         /**
