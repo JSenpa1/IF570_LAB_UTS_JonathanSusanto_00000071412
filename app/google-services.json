@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "536057210397",
+    "project_id": "if570labutsjonathansusanto",
+    "storage_bucket": "if570labutsjonathansusanto.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:536057210397:android:8a0bfefee982d224a988f4",
+        "android_client_info": {
+          "package_name": "com.example.if570_lab_uts_jonathansusanto_00000071412"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9Z-4JhIcxMAsCD0SZKfYGSDsacC1ANuY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
