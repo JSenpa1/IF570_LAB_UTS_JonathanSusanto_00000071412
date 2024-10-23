@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.math.log
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -36,6 +37,7 @@ class ProfileFragment : Fragment() {
     private lateinit var textNama: TextView
     private lateinit var textNim: TextView
     private lateinit var buttonEditProfile: Button
+    private lateinit var buttonLogout: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +63,7 @@ class ProfileFragment : Fragment() {
         textNama = view.findViewById(R.id.textNama)
         textNim = view.findViewById(R.id.textNim)
         buttonEditProfile = view.findViewById(R.id.buttonEditProfile)
+        buttonLogout = view.findViewById(R.id.buttonLogout)
 
         loadUserProfile()
 
@@ -72,7 +75,23 @@ class ProfileFragment : Fragment() {
             }
         }
 
+        buttonLogout.setOnClickListener {
+            logoutUser()
+        }
+
         return view
+    }
+
+    private fun logoutUser() {
+        auth.signOut() // Firebase sign out
+
+        // Redirect to the login activity or another screen
+        Intent(activity, login::class.java).also {
+            it.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Clear the activity stack
+            startActivity(it)
+        }
+
+        Toast.makeText(requireContext(), "Successfully logged out", Toast.LENGTH_SHORT).show()
     }
 
     // Fetch the user data from Firestore
