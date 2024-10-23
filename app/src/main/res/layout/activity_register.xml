@@ -7,69 +7,122 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#0AF2BD"
+    android:background="@drawable/colorful_phone"
     tools:context=".register">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-black"
-        android:text="UNION"
+        android:layout_marginTop="10dp"
+        android:fontFamily="casual"
+        android:text="ATTENDIFY"
         android:textColor="#FFFFFF"
-        android:textSize="40sp" />
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="5dp"
+        android:layout_gravity="center"
+        >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="20dp"
+        >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:fontFamily="sans-serif-black"
+        android:text="SIGN UP"
+        android:textColor="#6200EE"
+        android:textSize="30sp" />
 
     <EditText
         android:id="@+id/registerEmail"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_margin="20sp"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        android:hint="Email" />
+        android:hint="Email"
+        android:background="@drawable/circular_edittext"
+        android:drawableStart="@drawable/email"
+        android:drawablePadding="10dp"
+        />
 
     <EditText
         android:id="@+id/registerNama"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_margin="20sp"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        android:hint="Nama" />
+        android:hint="Nama"
+        android:background="@drawable/circular_edittext"
+        android:drawableStart="@drawable/person_logo"
+        android:drawablePadding="10dp"
+        />
 
     <EditText
         android:id="@+id/registerNim"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_margin="20sp"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
+        android:background="@drawable/circular_edittext"
+        android:drawableStart="@drawable/numbers"
+        android:drawablePadding="10dp"
         android:hint="NIM" />
 
     <EditText
         android:id="@+id/registerPassword"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:hint="Password"
         android:layout_margin="20sp"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        android:background="@drawable/circular_edittext"
+        android:drawableStart="@drawable/password"
+        android:drawablePadding="10dp"
+        />
 
     <Button
         android:id="@+id/registerButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20sp"
-        android:textColor="@color/black"
-        android:text="Register" />
+        android:textColor="@color/white"
+        android:background="@drawable/login_shape_bk"
+        android:backgroundTint="@android:color/transparent"
+        android:text="REGISTER" />
 
     <Button
         android:id="@+id/changePageLogin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_margin="20sp"
-        android:textColor="@color/black"
-        android:text="Already have Account?" />
+        android:textColor="#0000FF"
+        android:background="@android:color/transparent"
+        android:text="Already have Account? Log in" />
+
+    </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
     <!--    <Button-->
     <!--        android:id="@+id/registerButton"-->

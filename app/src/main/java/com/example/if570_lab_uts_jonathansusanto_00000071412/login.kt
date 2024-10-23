@@ -20,8 +20,14 @@ class login : AppCompatActivity() {
         val loginEmail: EditText = findViewById(R.id.loginEmail)
         val loginPassword: EditText = findViewById(R.id.loginPassword)
         val loginButton: Button = findViewById(R.id.loginButton)
+        val changeSign: Button = findViewById(R.id.changePageLogin)
 
         val mAuth = FirebaseAuth.getInstance()
+
+        changeSign.setOnClickListener() {
+            val Intent = Intent(this@login, register::class.java)
+            startActivity(Intent)
+        }
 
         loginButton.setOnClickListener {
             val email = loginEmail.text.toString().trim()

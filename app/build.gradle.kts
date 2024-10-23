@@ -45,6 +45,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage:20.2.0")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.github.bumptech.glide:glide:4.14.2")
+    implementation("com.android.support:cardview-v7:26.1.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

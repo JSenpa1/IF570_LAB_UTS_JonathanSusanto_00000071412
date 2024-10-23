@@ -40,6 +40,7 @@ class HomeFragment : Fragment() {
     private lateinit var mAuth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
     private lateinit var firestore: FirebaseFirestore
+    private lateinit var textViewGreetings: TextView
     private var currentAttendanceType: String? = null
 
     private lateinit var textViewClock: TextView
@@ -71,6 +72,8 @@ class HomeFragment : Fragment() {
         val textViewDateTime: TextView = view.findViewById(R.id.textViewDateTime)
         val buttonAttendance: Button = view.findViewById(R.id.buttonAttendance)
         val buttonAttendanceKeluar: Button = view.findViewById(R.id.buttonAttendance2)
+        textViewGreetings = view.findViewById(R.id.textGreetings)
+
         textViewClock = view.findViewById(R.id.textViewDateTime)
 
         handler.post(runnable)
@@ -79,6 +82,8 @@ class HomeFragment : Fragment() {
         mAuth = FirebaseAuth.getInstance()
         storage = FirebaseStorage.getInstance()
         firestore = FirebaseFirestore.getInstance()
+
+        fetchUserName()
 
         // Get the current date and time
         val currentDateTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
@@ -97,6 +102,30 @@ class HomeFragment : Fragment() {
         }
 
         return view
+    }
+
+    private fun fetchUserName() {
+        val currentUser = mAuth.currentUser
+        val email = currentUser?.email ?: return // Get the current user's email
+
+        firestore.collection("users") // Change to your Firestore collection name
+            .whereEqualTo("email", email) // Query to find the user by email
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    // No user found with this email
+                    textViewGreetings.text = "User not found"
+                } else {
+                    for (document in documents) {
+                        // Get the user's name from the document
+                        val name = document.getString("nama") // Adjust the field name as necessary
+                        textViewGreetings.text = "Welcome, $name!" // Update the TextView with the name
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(requireContext(), "Failed to fetch user name: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun updateClock() {
