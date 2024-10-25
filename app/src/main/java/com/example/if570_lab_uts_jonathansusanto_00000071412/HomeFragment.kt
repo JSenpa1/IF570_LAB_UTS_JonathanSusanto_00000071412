@@ -15,6 +15,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
@@ -162,33 +163,47 @@ class HomeFragment : Fragment() {
         val email = currentUser?.email ?: return
         val currentDateTime = System.currentTimeMillis()
 
-        // Get attendance records from Firestore
         firestore.collection("attendance")
             .whereEqualTo("email", email)
             .get()
             .addOnSuccessListener { documents ->
-                var canAttend = true
-                var lastKeluarTime: Long? = null
+                var canAttendMasuk = true
+                var canAttendKeluar = true
 
                 for (document in documents) {
                     val attendanceRecord = document.data
                     val attendanceTypeStored = attendanceRecord["attendanceType"] as? String
                     val dateTimeStored = attendanceRecord["dateTime"] as? String
 
-                    // Check if it's "keluar" and within the last 24 hours
-                    if (attendanceTypeStored == "keluar") {
-                        val recordTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(dateTimeStored).time
-                        if (currentDateTime - recordTime < 24 * 60 * 60 * 1000) { // 24 hours in milliseconds
-                            canAttend = false
-                            lastKeluarTime = recordTime
-                            break
-                        }
+                    val recordTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(dateTimeStored)?.time ?: continue
+
+                    // Check if the stored record is within the last 24 hours
+                    val withinLast24Hours = (currentDateTime - recordTime) < 24 * 60 * 60 * 1000
+
+                    // If the record is 'masuk' and within 24 hours, restrict further 'masuk'
+                    if (attendanceTypeStored == "masuk" && withinLast24Hours) {
+                        canAttendMasuk = false
+                    }
+
+                    // If the record is 'keluar' and within 24 hours, restrict further 'keluar'
+                    if (attendanceTypeStored == "keluar" && withinLast24Hours) {
+                        canAttendKeluar = false
                     }
                 }
 
-                // Logic to handle attendance
+                // Determine if the requested attendance type is allowed
+                val canAttend = when (attendanceType) {
+                    "masuk" -> canAttendMasuk
+                    "keluar" -> canAttendKeluar
+                    else -> false
+                }
+
                 if (!canAttend) {
-                    Toast.makeText(requireContext(), "You cannot attend 'masuk' or 'keluar' within 24 hours of the last 'keluar'.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "You cannot perform '$attendanceType' within 24 hours of the last one.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
                     // Proceed to upload the image
                     uploadImage(bitmap, attendanceType)
@@ -198,6 +213,60 @@ class HomeFragment : Fragment() {
                 Toast.makeText(requireContext(), "Failed to fetch attendance records: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
+
+//    private fun checkAttendanceHistoryAndUploadImage(bitmap: Bitmap, attendanceType: String) {
+//        val currentUser = mAuth.currentUser
+//        val email = currentUser?.email ?: return
+//        val currentDateTime = System.currentTimeMillis()
+//
+//        // Get attendance records from Firestore
+//        firestore.collection("attendance")
+//            .whereEqualTo("email", email)
+//            .get()
+//            .addOnSuccessListener { documents ->
+//                var canAttend = true
+//                var lastKeluarTime: Long? = null
+//                var lastMasukTime: Long? = null
+//
+//                for (document in documents) {
+//                    val attendanceRecord = document.data
+//                    val attendanceTypeStored = attendanceRecord["attendanceType"] as? String
+//                    val dateTimeStored = attendanceRecord["dateTime"] as? String
+//
+//                    // Check if it's "keluar" and within the last 24 hours
+//                    if (attendanceTypeStored == "keluar") {
+//                        val recordTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(dateTimeStored).time
+//                        if (currentDateTime - recordTime < 24 * 60 * 60 * 1000) { // 24 hours in milliseconds
+//                            canAttend = false
+//                            lastKeluarTime = recordTime
+//                            break
+//                        }
+//                    }
+//
+//                    // Check if it's masuk and within the last 24 hours
+//                    if (attendanceTypeStored == "masuk") {
+//                        val recordTimeMasuk = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(dateTimeStored).time
+//                        if (currentDateTime - recordTimeMasuk < 24 * 60 * 60 * 1000) { // 24 hours in milliseconds
+//                            canAttend = false
+//                            lastMasukTime = recordTimeMasuk
+//                            break
+//                        }
+//                    }
+//                }
+//
+//                // Logic to handle attendance
+//                if (!canAttend) {
+//                    Toast.makeText(requireContext(), "You cannot attend 'masuk' or 'keluar' within 24 hours of the last 'keluar'.", Toast.LENGTH_SHORT).show()
+//                } else {
+//                    // Proceed to upload the image
+//                    uploadImage(bitmap, attendanceType)
+//                }
+//            }
+//            .addOnFailureListener { exception ->
+//                Toast.makeText(requireContext(), "Failed to fetch attendance records: ${exception.message}", Toast.LENGTH_SHORT).show()
+//            }
+//    }
 
     private fun saveToFirestore(imageUrl: String, email: String?, dateTime: String, attendanceType: String) {
         val attendanceData = hashMapOf(
